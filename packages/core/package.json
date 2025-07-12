@@ -1,0 +1,22 @@
+{
+  "name": "mcpturbo-core",
+  "version": "0.1.0",
+  "description": "MCPTurbo core package",
+  "private": false,
+  "main": "mcpturbo_core/__init__.py",
+  "scripts": {
+    "build": "python -m build",
+    "test": "python -m pytest",
+    "dev": "pip install -e .",
+    "clean": "rm -rf dist/ build/ *.egg-info/",
+    "publish": "python -m twine upload dist/*"
+  },
+  "keywords": ["mcp", "agents", "ai", "automation"],
+  "author": "Federico Monfasani",
+  "license": "MIT",
+  "files": [
+    "mcpturbo_core/",
+    "pyproject.toml",
+    "README.md"
+  ]
+}

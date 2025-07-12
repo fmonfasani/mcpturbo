@@ -1,0 +1,54 @@
+{
+  "name": "mcpturbo-monorepo",
+  "version": "1.0.0",
+  "description": "MCPTurbo - AI Agent Communication and Orchestration Platform",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "install-all": "npm install && lerna exec -- pip install -e .",
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "dev": "lerna run dev",
+    "clean": "lerna run clean",
+    "list": "lerna list",
+    "changed": "lerna changed",
+    "diff": "lerna diff",
+    "exec": "lerna exec",
+    "run": "lerna run",
+    "version": "lerna version",
+    "publish-npm": "lerna publish",
+    "publish-pypi": "lerna exec -- python -m build && python -m twine upload dist/*",
+    "setup-dev": "python tools/scripts/dev-install.py",
+    "build-all": "python tools/scripts/build-all.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fmonfasani/mcpturbo.git"
+  },
+  "keywords": [
+    "mcp",
+    "agents", 
+    "ai",
+    "automation",
+    "orchestration",
+    "development-tools",
+    "code-generation",
+    "microservices"
+  ],
+  "author": "Federico Monfasani",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fmonfasani/mcpturbo/issues"
+  },
+  "homepage": "https://github.com/fmonfasani/mcpturbo#readme",
+  "devDependencies": {
+    "lerna": "^8.2.3"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0",
+    "python": ">=3.8.0"
+  }
+}

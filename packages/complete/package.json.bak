@@ -1,0 +1,22 @@
+{
+  "name": "mcpturbo-complete",
+  "version": "0.1.0",
+  "description": "MCPTurbo complete package",
+  "private": false,
+  "main": "mcpturbo_complete/__init__.py",
+  "scripts": {
+    "build": "python -m build",
+    "test": "python -m pytest",
+    "dev": "pip install -e .",
+    "clean": "rm -rf dist/ build/ *.egg-info/",
+    "publish": "python -m twine upload dist/*"
+  },
+  "keywords": ["mcp", "agents", "ai", "automation"],
+  "author": "Federico Monfasani",
+  "license": "MIT",
+  "files": [
+    "mcpturbo_complete/",
+    "pyproject.toml",
+    "README.md"
+  ]
+}
