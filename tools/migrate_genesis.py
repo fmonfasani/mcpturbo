@@ -1,3 +1,4 @@
+
 import argparse
 import shutil
 import datetime
@@ -64,6 +65,7 @@ def main():
     migrator = GenesisMigrator(Path(args.genesis_path), Path(args.repo_root))
     report = migrator.run()
     print(f'Migration complete. Report written to {report}')
+
 
 if __name__ == '__main__':
     main()
