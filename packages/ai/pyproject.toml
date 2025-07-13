@@ -55,10 +55,7 @@ Issues = "https://github.com/fmonfasani/{project_name}/issues"
 Documentation = "https://mcpturbo.dev/docs/{project_name.replace('mcpturbo-', '')}"
 
 [tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-dir]
-"" = "src"
+where = ["."]
 
 [tool.black]
 line-length = 88
