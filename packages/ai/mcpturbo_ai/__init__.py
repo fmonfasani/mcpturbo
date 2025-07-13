@@ -9,23 +9,40 @@ __author__ = "Federico Monfasani"
 
 # AI Agent adapters
 from .adapters import (
-    OpenAIAgent, ClaudeAgent, DeepSeekAgent,
-    create_openai_agent, create_claude_agent, create_deepseek_agent,
-    create_multi_llm_setup
+    OpenAIAgent,
+    ClaudeAgent,
+    DeepSeekAgent,
+    create_openai_agent,
+    create_claude_agent,
+    create_deepseek_agent,
+    create_multi_llm_setup,
 )
+from .genesis_agents import (
+    GenesisArchitectAgent,
+    GenesisBackendAgent,
+    GenesisFrontendAgent,
+    GenesisDevOpsAgent,
+)
+from .genesis_factory import create_genesis_agents, setup_genesis_environment
 
 # Main exports
 __all__ = [
     # Agent classes
     "OpenAIAgent",
-    "ClaudeAgent", 
+    "ClaudeAgent",
     "DeepSeekAgent",
-    
+    "GenesisArchitectAgent",
+    "GenesisBackendAgent",
+    "GenesisFrontendAgent",
+    "GenesisDevOpsAgent",
+
     # Factory functions
     "create_openai_agent",
     "create_claude_agent",
     "create_deepseek_agent",
     "create_multi_llm_setup",
+    "create_genesis_agents",
+    "setup_genesis_environment",
     
     # Metadata
     "__version__",
