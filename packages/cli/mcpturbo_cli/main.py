@@ -1,3 +1,4 @@
+
 """Main entry point for ``mcpturbo-cli``."""
 
 from __future__ import annotations
@@ -8,11 +9,13 @@ from typing import Any, Sequence
 from .commands import genesis as genesis_cmd
 
 
+
 class McpturboCli:
     """Main class for mcpturbo-cli."""
 
     def __init__(self) -> None:
         self.version = "1.0.0"
+
 
     async def run(self, argv: Sequence[str] | None = None) -> Any:
         """Parse arguments and execute the chosen command."""
@@ -43,4 +46,5 @@ class McpturboCli:
 
         parser.print_help()
         return None
+
 

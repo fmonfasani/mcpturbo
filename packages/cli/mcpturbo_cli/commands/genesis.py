@@ -1,3 +1,4 @@
+
 """Commands for project initialization using Genesis."""
 
 from argparse import Namespace
