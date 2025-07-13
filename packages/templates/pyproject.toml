@@ -59,6 +59,7 @@ where = ["."]
 include = ["mcpturbo_templates*"]
 
 
+
 [tool.black]
 line-length = 88
 target-version = ['py39']

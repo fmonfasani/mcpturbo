@@ -62,7 +62,6 @@ where = ["."]
 
 include = ["mcpturbo_web_stack*"]
 
-
 [tool.black]
 line-length = 88
 target-version = ['py39']
