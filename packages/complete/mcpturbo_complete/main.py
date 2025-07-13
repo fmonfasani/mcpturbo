@@ -1,5 +1,9 @@
 """Main module for mcpturbo-complete"""
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class McpturboComplete:
     """Main class for mcpturbo-complete"""
     
@@ -10,6 +14,6 @@ class McpturboComplete:
 
         """Simple execution entry point."""
         message = f"mcpturbo-complete {self.version} running"
-        print(message)
+        logger.info(message)
         return message
 
