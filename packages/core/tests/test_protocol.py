@@ -13,6 +13,8 @@ from mcpturbo_core.messages import Request, Response, create_request
 from mcpturbo_core.exceptions import MCPError, TimeoutError, CircuitBreakerError, RateLimitError
 from mcpturbo_agents.base_agent import LocalAgent, ExternalAgent, AgentConfig, AgentType
 
+pytestmark = pytest.mark.asyncio
+
 
 class TestMCPProtocol:
     """Test cases for MCP Protocol v2"""
