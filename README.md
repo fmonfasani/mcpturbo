@@ -409,9 +409,30 @@ protocol.register_agent("test", agent)
 
 response = await protocol.send_request(
     sender_id="user",
-    target_id="test", 
+    target_id="test",
     action="action"
 )
+```
+
+## Genesis Engine Migration
+
+La nueva "Genesis Engine" simplifica la creación de proyectos listos para usar con MCPturbo. Ejecuta `genesis init` para generar la estructura base y los archivos de Docker necesarios.
+
+### Variables de Entorno Requeridas
+```bash
+export OPENAI_API_KEY="sk-..."
+export CLAUDE_API_KEY="sk-ant-..."
+export DEEPSEEK_API_KEY="..."
+```
+
+### Ejemplo de Uso
+```bash
+# Crear un proyecto
+genesis init myproject
+cd myproject
+
+# Ejecutar los contenedores generados
+docker compose up --build
 ```
 
 ## 🎯 Casos de Uso Reales
