@@ -7,6 +7,5 @@ class McpturboCli:
         self.version = "1.0.0"
         
     async def run(self):
-        """Main execution method"""
-        # Implementation will be added
-        pass
+        """Run the CLI entry point"""
+        return f"{self.__class__.__name__} running (v{self.version})"
