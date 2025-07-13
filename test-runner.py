@@ -43,7 +43,7 @@ def run_tests_for_package(package_path):
             print(result.stdout)
             print(result.stderr)
             return False
-    except Exception as e:<<<<<<< codex/update-pyproject.toml-configurations
+    except Exception as e:
         print(f"ERROR: running tests for {package_name}: {e}")
 
         return False
