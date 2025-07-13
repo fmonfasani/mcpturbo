@@ -1,3 +1,4 @@
+
 """Integration helpers for the ``genesis`` project initializer."""
 
 from typing import Any, Dict
@@ -38,4 +39,5 @@ async def genesis_init(project_name: str, app_type: str = "web") -> Dict[str, An
     return result
 
 __all__ = ["genesis_setup", "genesis_init"]
+
 

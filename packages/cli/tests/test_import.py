@@ -27,3 +27,11 @@ class TestBasicCli:
     def test_placeholder(self):
         """Placeholder test - replace with real tests"""
         assert True, "Placeholder test passed"
+
+    def test_run_executes(self):
+        """Ensure the CLI entry point runs without error"""
+        import asyncio
+        from mcpturbo_cli.main import McpturboCli
+
+        result = asyncio.run(McpturboCli().run())
+        assert "running" in result
