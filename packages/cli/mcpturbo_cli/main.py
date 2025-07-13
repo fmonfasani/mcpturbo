@@ -1,8 +1,13 @@
-"""Main module for mcpturbo-cli."""
 
+"""Main entry point for ``mcpturbo-cli``."""
 
-from argparse import ArgumentParser
-from mcpturbo_agents import GenesisAgent, AgentConfig, AgentType, register_agent
+from __future__ import annotations
+
+import argparse
+from typing import Any, Sequence
+
+from .commands import genesis as genesis_cmd
+
 
 
 class McpturboCli:
@@ -11,25 +16,35 @@ class McpturboCli:
     def __init__(self) -> None:
         self.version = "1.0.0"
 
-    async def run(self) -> None:
-        """Placeholder for future async logic."""
-        pass
 
+    async def run(self, argv: Sequence[str] | None = None) -> Any:
+        """Parse arguments and execute the chosen command."""
+        parser = argparse.ArgumentParser(prog="mcpturbo")
+        subparsers = parser.add_subparsers(dest="command")
 
-def main(argv: list[str] | None = None) -> None:
-    """Entry point for the mcpturbo CLI."""
-    parser = ArgumentParser(prog="mcpturbo-cli")
-    sub = parser.add_subparsers(dest="command")
-    sub.add_parser("genesis", help="Register the Genesis agent")
-    args = parser.parse_args(argv)
+        # ``genesis`` command group
+        genesis_parser = subparsers.add_parser(
+            "genesis", help="Project initialization commands"
+        )
+        genesis_sub = genesis_parser.add_subparsers(dest="subcommand")
 
-    if args.command == "genesis":
-        agent = GenesisAgent(AgentConfig(agent_id="genesis", name="Genesis", agent_type=AgentType.LOCAL))
-        register_agent(agent)
-        print("Genesis agent registered")
-    else:
+        init_parser = genesis_sub.add_parser(
+            "init", help="Initialize a new project via Genesis"
+        )
+        init_parser.add_argument("name", help="Project name")
+        init_parser.add_argument(
+            "--type",
+            dest="type",
+            default="web",
+            help="Project type (default: web)",
+        )
+
+        args = parser.parse_args(list(argv) if argv is not None else None)
+
+        if args.command == "genesis" and args.subcommand == "init":
+            return await genesis_cmd.cmd_init(args)
+
         parser.print_help()
+        return None
 
 
-if __name__ == "__main__":  # pragma: no cover - manual execution
-    main()
