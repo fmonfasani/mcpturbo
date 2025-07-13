@@ -1,3 +1,4 @@
+
 import argparse
 import importlib
 import sys
@@ -73,4 +74,5 @@ def main():
     print(f'Validation complete. Report written to {report}')
 
 if __name__ == '__main__':
+
     main()
