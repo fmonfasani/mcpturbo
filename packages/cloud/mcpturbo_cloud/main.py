@@ -1,5 +1,9 @@
 """Main module for mcpturbo-cloud"""
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class McpturboCloud:
     """Main class for mcpturbo-cloud"""
     
@@ -10,6 +14,6 @@ class McpturboCloud:
 
         """Simple execution entry point."""
         message = f"mcpturbo-cloud {self.version} running"
-        print(message)
+        logger.info(message)
         return message
 
