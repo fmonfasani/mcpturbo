@@ -57,6 +57,9 @@ Documentation = "https://mcpturbo.dev/docs/{project_name.replace('mcpturbo-', ''
 [tool.setuptools.packages.find]
 where = ["."]
 
+include = ["mcpturbo_ai*"]
+
+
 [tool.black]
 line-length = 88
 target-version = ['py39']

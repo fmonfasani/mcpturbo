@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Test runner que maneja packages vacíos gracefully"""
-
+"""Test runner that handles empty packages gracefully"""
 
 import subprocess
 import sys
@@ -16,18 +15,15 @@ def run_tests_for_package(package_path):
 
     if not tests_dir.exists():
 
-        print(f"â ï¸ No tests directory for {package_name}")
-
-        return True  # Success - no tests to run
+        print(f"WARNING: No tests directory for {package_name}")
+        return True
 
     test_files = list(tests_dir.glob("test_*.py"))
     if not test_files:
+        print(f"WARNING: No test files in {package_name}")
+        return True
 
-        print(f"â ï¸ No test files in {package_name}")
-        return True  # Success - no tests to run
-
-
-    print(f" Running tests for {package_name}...")
+    print(f"Running tests for {package_name}...")
 
 
     try:
@@ -39,36 +35,30 @@ def run_tests_for_package(package_path):
         )
 
         if result.returncode == 0:
-
-            print(f"â {package_name} tests passed")
+            print(f"PASS: {package_name} tests passed")
             return True
         else:
-            print(f"â {package_name} tests failed")
+            print(f"FAIL: {package_name} tests failed")
 
             print(result.stdout)
             print(result.stderr)
             return False
-    except Exception as e:
-
-        print(f"â Error running tests for {package_name}: {e}")
+    except Exception as e:<<<<<<< codex/update-pyproject.toml-configurations
+        print(f"ERROR: running tests for {package_name}: {e}")
 
         return False
 
 
 def main():
-    """Main test runner"""
     packages_dir = Path("packages")
 
     if not packages_dir.exists():
 
-        print("â No packages directory found")
-
+        print("ERROR: No packages directory found")
         sys.exit(1)
 
     packages = [d for d in packages_dir.iterdir() if d.is_dir()]
-
-
-    print(f" Running tests for {len(packages)} packages...")
+    print(f"Running tests for {len(packages)} packages...")
 
 
     passed = 0
@@ -81,14 +71,13 @@ def main():
             failed += 1
 
 
-    print(f"\n Test Results: {passed} passed, {failed} failed")
-
+    print(f"\nTest Results: {passed} passed, {failed} failed")
 
     if failed > 0:
-        print("â Some tests failed")
+        print("Some tests failed")
         sys.exit(1)
     else:
-        print("â All tests passed!")
+        print("All tests passed!")
 
         sys.exit(0)
 
