@@ -5,6 +5,9 @@ import sys
 from pathlib import Path
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+
 def test_dummy_always_pass():
     """Dummy test that always passes"""
     assert True, "Dummy test for web package"
@@ -30,3 +33,13 @@ def test_run_executes():
 def test_future_functionality():
     """Placeholder for future tests"""
     pass
+
+
+@pytest.mark.asyncio
+async def test_run_executes():
+    """Ensure the web entry point runs without error."""
+    from mcpturbo_web.main import McpturboWeb
+
+    web = McpturboWeb()
+    result = await web.run()
+    assert "mcpturbo-web" in result
