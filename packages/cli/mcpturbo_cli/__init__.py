@@ -1,5 +1,4 @@
-"""
-Mcpturbo Cli
+"""Mcpturbo Cli
 
 MCPTurbo - Command Line Interface
 """
@@ -7,5 +6,6 @@ MCPTurbo - Command Line Interface
 __version__ = "1.0.0"
 __author__ = "Federico Monfasani"
 
-# Main exports will be added here
-__all__ = []
+from .main import main, McpturboCli
+
+__all__ = ["main", "McpturboCli", "__version__", "__author__"]
