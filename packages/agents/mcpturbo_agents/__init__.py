@@ -7,67 +7,64 @@ Enhanced agent system supporting both local and external AI agents.
 __version__ = "2.0.0"
 __author__ = "Federico Monfasani"
 
-# Base agent classes
 from .base_agent import (
-    BaseAgent, LocalAgent, ExternalAgent, HybridAgent,
-    AgentType, AgentStatus, AgentCapability, AgentConfig,
-    create_local_agent, create_external_agent
+    BaseAgent,
+    AgentConfig,
+    AgentCapability,
+    AgentStatus,
+    AgentType,
+    create_local_agent,
+    create_external_agent,
+    LocalAgent,
+    ExternalAgent,
+    HybridAgent,
 )
-
-# Registry for managing agents
 from .registry import AgentRegistry
+from .genesis_agent import GenesisAgent
 
-# Main exports
 __all__ = [
-    # Base classes
     "BaseAgent",
-    "LocalAgent", 
+    "LocalAgent",
     "ExternalAgent",
     "HybridAgent",
-    
-    # Configuration and types
+    "GenesisAgent",
     "AgentConfig",
     "AgentCapability",
     "AgentType",
     "AgentStatus",
-    
-    # Registry
     "AgentRegistry",
-    
-    # Factory functions
     "create_local_agent",
     "create_external_agent",
-    
-    # Metadata
     "__version__",
-    "__author__"
+    "__author__",
 ]
 
-# Global registry instance
 registry = AgentRegistry()
 
-# Convenience functions
-def register_agent(agent: BaseAgent, **kwargs):
-    """Register agent in global registry and protocol"""
+
+def register_agent(agent: BaseAgent, **kwargs) -> None:
+    """Register agent in global registry and protocol."""
     registry.register(agent)
-    
-    # Also register with MCP protocol if available
     try:
         from mcpturbo_core.protocol import protocol
-        protocol.register_agent(agent.config.agent_id, agent, **kwargs)
-    except ImportError:
-        pass  # Core not available
 
-def get_agent(agent_id: str) -> BaseAgent:
-    """Get agent from global registry"""
+        protocol.register_agent(agent.config.agent_id, agent, **kwargs)
+    except ImportError:  # pragma: no cover - optional core
+        pass
+
+
+def get_agent(agent_id: str) -> BaseAgent | None:
+    """Retrieve agent from global registry."""
     return registry.get(agent_id)
 
-def list_agents() -> list:
-    """List all registered agents"""
+
+def list_agents() -> list[str]:
+    """List all registered agent IDs."""
     return registry.list_agents()
 
-def create_simple_agent(agent_id: str, name: str = None) -> LocalAgent:
-    """Create and register a simple local agent"""
+
+def create_simple_agent(agent_id: str, name: str | None = None) -> LocalAgent:
+    """Create and register a simple local agent."""
     agent = create_local_agent(agent_id, name)
     register_agent(agent)
     return agent
