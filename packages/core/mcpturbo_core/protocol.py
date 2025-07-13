@@ -76,6 +76,8 @@ class MCPProtocol:
         self.pending_requests: Dict[str, asyncio.Future] = {}
         self.session: Optional[aiohttp.ClientSession] = None
         self.running = False
+        self.messages_sent = 0
+        self.messages_received = 0
         
     async def start(self):
         if not self.running:
@@ -140,6 +142,7 @@ class MCPProtocol:
         
         for attempt in range(retry_config.max_attempts):
             try:
+                self.messages_sent += 1
                 response = await self._send_request_attempt(request)
                 
                 # Actualizar circuit breaker en éxito
@@ -181,24 +184,28 @@ class MCPProtocol:
             else:
                 raise MCPError(f"Agent {request.target} not compatible")
             
-            return Response(
+            response = Response(
                 sender=request.target,
                 target=request.sender,
                 request_id=request.id,
                 success=True,
                 result=result
             )
+            self.messages_received += 1
+            return response
             
         except asyncio.TimeoutError:
             raise TimeoutError(f"Request to {request.target} timed out")
         except Exception as e:
-            return Response(
+            response = Response(
                 sender=request.target,
                 target=request.sender,
                 request_id=request.id,
                 success=False,
                 error=str(e)
             )
+            self.messages_received += 1
+            return response
     
     async def _send_external_request(self, agent: Any, request: Request) -> Any:
         if not self.session:
@@ -251,6 +258,8 @@ class MCPProtocol:
         return {
             "agents": len(self.agents),
             "running": self.running,
+            "messages_sent": self.messages_sent,
+            "messages_received": self.messages_received,
             "circuit_breakers": {
                 agent_id: {
                     "state": cb.state.value,
