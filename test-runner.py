@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Test runner que maneja packages vacios gracefully"""
+
+"""Test runner that handles empty packages gracefully"""
+
 
 import subprocess
 import sys
@@ -21,7 +23,9 @@ def run_tests_for_package(package_path):
         print(f"No test files in {package_name}")
         return True  # Success - no tests to run
 
-    print(f"Running tests for {package_name}...")
+
+    print(f" Running tests for {package_name}...")
+
 
     try:
         result = subprocess.run(
@@ -54,7 +58,9 @@ def main():
 
     packages = [d for d in packages_dir.iterdir() if d.is_dir()]
 
-    print(f"Running tests for {len(packages)} packages...")
+
+    print(f" Running tests for {len(packages)} packages...")
+
 
     passed = 0
     failed = 0
@@ -65,7 +71,7 @@ def main():
         else:
             failed += 1
 
-    print(f"\nTest Results: {passed} passed, {failed} failed")
+    print(f"\n Test Results: {passed} passed, {failed} failed")
 
     if failed > 0:
         print("Some tests failed")

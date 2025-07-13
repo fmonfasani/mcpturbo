@@ -15,23 +15,8 @@ class McpturboCli:
     def __init__(self):
         self.version = "1.0.0"
 
-    async def _run_async(self, args: argparse.Namespace) -> None:
-        if hasattr(args, "func"):
-            await args.func(args)
-        else:
-            raise SystemExit("No command specified")
+        
+    async def run(self):
+        """Run the CLI entry point"""
+        return f"{self.__class__.__name__} running (v{self.version})"
 
-    def run(self, argv: Optional[list[str]] = None) -> None:
-        """Parse arguments and execute the chosen command."""
-        parser = argparse.ArgumentParser(prog="mcpturbo")
-        subparsers = parser.add_subparsers(dest="command")
-
-        # Register command groups
-        genesis.build_parser(subparsers)
-
-        args = parser.parse_args(argv)
-        asyncio.run(self._run_async(args))
-
-
-if __name__ == "__main__":
-    McpturboCli().run()
