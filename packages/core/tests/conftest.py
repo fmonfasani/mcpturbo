@@ -7,6 +7,10 @@ from pathlib import Path
 # Add package to Python path
 package_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(package_dir))
+# Ensure other packages in repository are importable
+repo_root = package_dir.parent.parent
+sys.path.insert(0, str(repo_root))
+sys.path.insert(0, str(repo_root / "packages" / "agents"))
 
 
 @pytest.fixture

@@ -7,7 +7,9 @@ class McpturboCloudStack:
         self.version = "1.0.0"
 
     async def run(self):
+
         """Simple execution entry point."""
         message = f"mcpturbo-cloud-stack {self.version} running"
         print(message)
         return message
+

@@ -28,6 +28,7 @@ class TestBasicCli:
         """Placeholder test - replace with real tests"""
         assert True, "Placeholder test passed"
 
+
     @pytest.mark.asyncio
     async def test_run_executes(self):
         """Ensure the CLI entry point runs without error."""
