@@ -59,7 +59,9 @@ Documentation = "https://mcpturbo.dev/docs/{project_name.replace('mcpturbo-', ''
 
 [tool.setuptools.packages.find]
 where = ["."]
+
 include = ["mcpturbo_web_stack*"]
+
 
 [tool.black]
 line-length = 88
