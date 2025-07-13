@@ -446,6 +446,18 @@ docker compose up
 
 ```
 
+### Generar reportes de migración y validación
+
+Una vez copiados los recursos de Genesis puedes producir los reportes ejecutando:
+
+```bash
+python tools/migrate_genesis.py /ruta/a/genesis
+python tools/validate_migration.py
+```
+
+Esto actualizará **MIGRATION_REPORT.md** y **VALIDATION_REPORT.md** con los
+resultados de la copia y una validación básica de los paquetes.
+
 ## 🎯 Casos de Uso Reales
 
 ### 1. Generación de Documentación
