@@ -414,25 +414,36 @@ response = await protocol.send_request(
 )
 ```
 
-## Genesis Engine Migration
 
-La nueva "Genesis Engine" simplifica la creación de proyectos listos para usar con MCPturbo. Ejecuta `genesis init` para generar la estructura base y los archivos de Docker necesarios.
+## 🚀 Genesis Engine Migration
 
-### Variables de Entorno Requeridas
+El nuevo comando `genesis init` automatiza la creación de la estructura base para proyectos MCPturbo. Ejecuta este comando en un directorio vacío y se generarán los archivos de configuración junto con un `docker-compose.yml` listo para usar.
+
+### Variables de entorno requeridas
+
+
 ```bash
 export OPENAI_API_KEY="sk-..."
 export CLAUDE_API_KEY="sk-ant-..."
 export DEEPSEEK_API_KEY="..."
+
+export MCP_DEBUG="true"
+export MCP_LOG_LEVEL="INFO"
+export MCP_CACHE_DIR="~/.mcpturbo/cache"
+export MCP_CONFIG_DIR="~/.mcpturbo"
 ```
 
-### Ejemplo de Uso
-```bash
-# Crear un proyecto
-genesis init myproject
-cd myproject
+### Ejemplo de uso
 
-# Ejecutar los contenedores generados
-docker compose up --build
+```bash
+# Crear un nuevo proyecto
+genesis init my-mcp-app
+cd my-mcp-app
+
+# Construir y ejecutar los contenedores
+docker compose build
+docker compose up
+
 ```
 
 ## 🎯 Casos de Uso Reales
