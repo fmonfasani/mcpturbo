@@ -1,69 +1,85 @@
+
+#!/usr/bin/env python3
 import argparse
 import shutil
-import datetime
 from pathlib import Path
+from datetime import datetime
+
 
 class GenesisMigrator:
-    """Migrate resources from a Genesis Engine installation."""
+    """Copy resources from Genesis Engine into this repo."""
 
-    def __init__(self, genesis_root: Path, repo_root: Path):
-        self.genesis_root = Path(genesis_root)
-        self.repo_root = Path(repo_root)
-        self.report_lines = []
+    def __init__(self, genesis_path: str, repo_root: Path | None = None):
+        self.genesis_path = Path(genesis_path).expanduser().resolve()
+        self.repo_root = repo_root or Path(__file__).resolve().parent.parent
+        self.report_lines: list[str] = []
 
-    def _copy_tree(self, src: Path, dest: Path):
-        if not src.exists():
+    def _find_source(self, candidates: list[str]) -> Path | None:
+        for rel in candidates:
+            path = self.genesis_path / rel
+            if path.exists():
+                return path
+        return None
+
+    def _copy_tree(self, src: Path | None, dest: Path):
+        if not src or not src.exists():
             self.report_lines.append(f"⚠️ Source not found: {src}")
-            return
-        for item in src.rglob('*'):
-            target = dest / item.relative_to(src)
-            if item.is_dir():
-                target.mkdir(parents=True, exist_ok=True)
-            else:
+            return 0
+        count = 0
+        for file in src.rglob('*'):
+            if file.is_file():
+                relative = file.relative_to(src)
+                target = dest / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(item, target)
-        self.report_lines.append(f"Copied {src} -> {dest}")
+                shutil.copy2(file, target)
+                count += 1
+        self.report_lines.append(f"Copied {count} files from {src} to {dest}")
+        return count
 
-    def migrate_cli_commands(self):
-        src = self.genesis_root / 'packages' / 'cli' / 'genesis_cli' / 'commands'
-        dest = self.repo_root / 'packages' / 'cli' / 'mcpturbo_cli' / 'commands'
-        self._copy_tree(src, dest)
+    def migrate(self) -> Path:
+        """Perform migration and generate report."""
+        cli_src = self._find_source([
+            'cli/commands',
+            'packages/cli/commands'
+        ])
+        templates_src = self._find_source([
+            'templates',
+            'packages/templates'
+        ])
+        workflows_src = self._find_source([
+            'workflows',
+            'packages/workflows'
+        ])
 
-    def migrate_templates(self):
-        src = self.genesis_root / 'packages' / 'templates' / 'genesis_templates'
-        dest = self.repo_root / 'packages' / 'templates' / 'mcpturbo_templates'
-        self._copy_tree(src, dest)
+        cli_dest = self.repo_root / 'packages' / 'cli' / 'commands'
+        templates_dest = self.repo_root / 'packages' / 'templates' / 'migrated'
+        workflows_dest = self.repo_root / 'packages' / 'orchestrator' / 'workflows'
 
-    def migrate_workflows(self):
-        src = self.genesis_root / 'packages' / 'workflows' / 'genesis_workflows'
-        dest = self.repo_root / 'packages' / 'workflows' / 'mcpturbo_workflows'
-        self._copy_tree(src, dest)
+        cli_dest.mkdir(parents=True, exist_ok=True)
+        templates_dest.mkdir(parents=True, exist_ok=True)
+        workflows_dest.mkdir(parents=True, exist_ok=True)
 
-    def write_report(self) -> Path:
+        self.report_lines.append(f"Migration started: {datetime.utcnow().isoformat()}\n")
+        self._copy_tree(cli_src, cli_dest)
+        self._copy_tree(templates_src, templates_dest)
+        self._copy_tree(workflows_src, workflows_dest)
+
         report_path = self.repo_root / 'MIGRATION_REPORT.md'
-        with report_path.open('w', encoding='utf-8') as f:
-            f.write('# Migration Report\n\n')
-            f.write(f'Date: {datetime.datetime.utcnow().isoformat()}Z\n\n')
-            for line in self.report_lines:
-                f.write(f'- {line}\n')
+        report_content = '# Migration Report\n\n' + '\n'.join(self.report_lines)
+        report_path.write_text(report_content)
         return report_path
 
-    def run(self):
-        self.migrate_cli_commands()
-        self.migrate_templates()
-        self.migrate_workflows()
-        return self.write_report()
 
-
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description='Migrate Genesis Engine resources')
     parser.add_argument('genesis_path', help='Path to Genesis Engine installation')
-    parser.add_argument('--repo-root', default=Path(__file__).resolve().parents[1], help='Target repo root')
+    parser.add_argument('--repo-root', help='Repository root', default=None)
     args = parser.parse_args()
 
-    migrator = GenesisMigrator(Path(args.genesis_path), Path(args.repo_root))
-    report = migrator.run()
-    print(f'Migration complete. Report written to {report}')
+    migrator = GenesisMigrator(args.genesis_path, Path(args.repo_root) if args.repo_root else None)
+    report = migrator.migrate()
+    print(f'Migration finished. Report generated at {report}')
+
 
 if __name__ == '__main__':
     main()
