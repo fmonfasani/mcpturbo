@@ -5,8 +5,9 @@ class McpturboAi:
     
     def __init__(self):
         self.version = "1.0.0"
-        
+
     async def run(self):
-        """Main execution method"""
-        # Implementation will be added
-        pass
+        """Simple execution entry point."""
+        message = f"mcpturbo-ai {self.version} running"
+        print(message)
+        return message
