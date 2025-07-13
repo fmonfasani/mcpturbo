@@ -1,6 +1,10 @@
 """Dummy test for mcpturbo_web_stack"""
 
 import pytest
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 def test_dummy_always_pass():
@@ -20,3 +24,13 @@ def test_package_directory_exists():
 def test_future_functionality():
     """Placeholder for future tests"""
     pass
+
+
+@pytest.mark.asyncio
+async def test_run_executes():
+    """Ensure the web-stack entry point runs without error."""
+    from mcpturbo_web_stack.main import McpturboWebStack
+
+    stack = McpturboWebStack()
+    result = await stack.run()
+    assert "mcpturbo-web-stack" in result
