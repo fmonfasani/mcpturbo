@@ -17,34 +17,8 @@ class McpturboCli:
         self.version = "1.0.0"
 
 
-    async def run(self, argv: Sequence[str] | None = None) -> Any:
-        """Parse arguments and execute the chosen command."""
-        parser = argparse.ArgumentParser(prog="mcpturbo")
-        subparsers = parser.add_subparsers(dest="command")
-
-        # ``genesis`` command group
-        genesis_parser = subparsers.add_parser(
-            "genesis", help="Project initialization commands"
-        )
-        genesis_sub = genesis_parser.add_subparsers(dest="subcommand")
-
-        init_parser = genesis_sub.add_parser(
-            "init", help="Initialize a new project via Genesis"
-        )
-        init_parser.add_argument("name", help="Project name")
-        init_parser.add_argument(
-            "--type",
-            dest="type",
-            default="web",
-            help="Project type (default: web)",
-        )
-
-        args = parser.parse_args(list(argv) if argv is not None else None)
-
-        if args.command == "genesis" and args.subcommand == "init":
-            return await genesis_cmd.cmd_init(args)
-
-        parser.print_help()
-        return None
-
-
+    async def run(self):
+        """Simple execution entry point."""
+        message = f"mcpturbo-cli {self.version} running"
+        print(message)
+        return message

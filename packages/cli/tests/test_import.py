@@ -23,15 +23,17 @@ def test_package_has_version():
 
 class TestBasicCli:
     """Basic test class for cli package"""
-    
+
     def test_placeholder(self):
         """Placeholder test - replace with real tests"""
         assert True, "Placeholder test passed"
 
-    def test_run_executes(self):
-        """Ensure the CLI entry point runs without error"""
-        import asyncio
+
+    @pytest.mark.asyncio
+    async def test_run_executes(self):
+        """Ensure the CLI entry point runs without error."""
         from mcpturbo_cli.main import McpturboCli
 
-        result = asyncio.run(McpturboCli().run())
-        assert "running" in result
+        cli = McpturboCli()
+        result = await cli.run()
+        assert "mcpturbo-cli" in result

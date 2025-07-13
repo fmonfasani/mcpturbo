@@ -5,6 +5,10 @@ import sys
 from pathlib import Path
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+
+
 def test_dummy_always_pass():
     """Dummy test that always passes"""
     assert True, "Dummy test for tools package"
@@ -30,3 +34,13 @@ def test_run_executes():
 def test_future_functionality():
     """Placeholder for future tests"""
     pass
+
+
+@pytest.mark.asyncio
+async def test_run_executes():
+    """Ensure the tools entry point runs without error."""
+    from mcpturbo_tools.main import McpturboTools
+
+    tools = McpturboTools()
+    result = await tools.run()
+    assert "mcpturbo-tools" in result
