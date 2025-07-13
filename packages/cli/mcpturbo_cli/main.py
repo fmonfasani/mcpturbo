@@ -1,5 +1,6 @@
 """Main module for mcpturbo-cli."""
 
+
 from argparse import ArgumentParser
 from mcpturbo_agents import GenesisAgent, AgentConfig, AgentType, register_agent
 
