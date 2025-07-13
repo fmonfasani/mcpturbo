@@ -8,6 +8,12 @@ from pathlib import Path
 package_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(package_dir))
 
+# Ensure other project packages are importable
+root_dir = package_dir.parent.parent
+sys.path.insert(0, str(root_dir))
+sys.path.insert(0, str(root_dir / "packages" / "ai"))
+sys.path.insert(0, str(root_dir / "packages" / "orchestrator"))
+
 
 @pytest.fixture
 def package_name():
