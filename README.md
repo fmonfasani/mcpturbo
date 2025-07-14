@@ -109,6 +109,33 @@ async def main():
 asyncio.run(main())
 ```
 
+## 🛠️ Uso como librería
+
+El protocolo y el orquestador se exponen también como clases para que puedas
+crear tus propias instancias y evitar las globales `protocol` y `orchestrator`.
+Esto resulta útil cuando integras MCPturbo dentro de otra aplicación.
+
+```python
+from mcpturbo_core import quick_setup, MCPProtocol
+from mcpturbo_orchestrator import ProjectOrchestrator
+from mcpturbo_ai import create_openai_agent
+
+config = quick_setup()
+
+protocol = MCPProtocol()               # instancia propia
+orchestrator = ProjectOrchestrator()   # sin singleton
+
+openai_agent = create_openai_agent(api_key=config.openai_api_key)
+orchestrator.register_agent(openai_agent)
+
+response = await protocol.send_request(
+    sender_id="user",
+    target_id="openai",
+    action="generate_text",
+    data={"prompt": "Hola mundo"}
+)
+```
+
 ## 🤖 Agentes Soportados
 
 ### OpenAI Agent
