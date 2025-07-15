@@ -1,8 +1,16 @@
 """Main module for mcpturbo-enterprise"""
 
+import logging
+
+from mcpturbo_core.logger import configure_logging
+
+configure_logging()
+logger = logging.getLogger(__name__)
+
+
 class McpturboEnterprise:
     """Main class for mcpturbo-enterprise"""
-    
+
     def __init__(self):
         self.version = "1.0.0"
 
@@ -10,5 +18,5 @@ class McpturboEnterprise:
 
         """Simple execution entry point."""
         message = f"mcpturbo-enterprise {self.version} running"
-        print(message)
+        logger.info(message)
         return message
