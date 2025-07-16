@@ -2,6 +2,9 @@
 
 import logging
 
+from mcpturbo_core.logger import configure_logging
+
+configure_logging()
 logger = logging.getLogger(__name__)
 
 class McpturboComplete:
