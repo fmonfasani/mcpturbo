@@ -15,6 +15,7 @@ from .exceptions import (
     AgentNotFoundError, AuthenticationError, ValidationError, APIError,
     ConfigurationError, SerializationError
 )
+from .logger import configure_logging
 
 # Message types
 from .messages import (
@@ -37,6 +38,7 @@ __all__ = [
     "load_config", 
     "save_config",
     "validate_environment",
+    "configure_logging",
     
     # Message types
     "Message",

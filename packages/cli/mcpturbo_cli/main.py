@@ -4,9 +4,14 @@
 from __future__ import annotations
 
 import argparse
+import logging
 from typing import Any, Sequence
 
+from mcpturbo_core.logger import configure_logging
 from .commands import genesis as genesis_cmd
+
+configure_logging()
+logger = logging.getLogger(__name__)
 
 
 
@@ -20,5 +25,5 @@ class McpturboCli:
     async def run(self):
         """Simple execution entry point."""
         message = f"mcpturbo-cli {self.version} running"
-        print(message)
+        logger.info(message)
         return message
