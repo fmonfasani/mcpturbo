@@ -1,4 +1,5 @@
 import asyncio
+import uuid
 from typing import Dict, List, Any, Optional, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -318,7 +319,6 @@ class ProjectOrchestrator:
     
     def _create_app_generation_workflow(self, **kwargs) -> Workflow:
         """Create workflow for complete app generation"""
-        import uuid
         
         workflow_id = str(uuid.uuid4())
         app_name = kwargs.get("app_name", "MyApp")
@@ -377,7 +377,6 @@ class ProjectOrchestrator:
     
     def _create_code_review_workflow(self, **kwargs) -> Workflow:
         """Create workflow for code review process"""
-        import uuid
         
         workflow_id = str(uuid.uuid4())
         code = kwargs.get("code", "")
@@ -426,7 +425,6 @@ class ProjectOrchestrator:
     
     def _create_architecture_workflow(self, **kwargs) -> Workflow:
         """Create workflow for architecture design"""
-        import uuid
         
         workflow_id = str(uuid.uuid4())
         requirements = kwargs.get("requirements", "")
