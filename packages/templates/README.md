@@ -26,6 +26,24 @@ result = await component.execute()
 print(f"Result: {result}")
 ```
 
+## 📝 Template Engine
+
+The package includes a lightweight ``TemplateEngine`` class.  You can load
+templates from a directory or register them programmatically.
+
+```python
+from mcpturbo_templates.engine import TemplateEngine
+
+# Load all files inside "./templates" on creation
+engine = TemplateEngine(template_dir="./templates")
+
+# Register one template manually
+engine.register_template("greet", "Hello ${name}!")
+
+result = await engine.render_template("greet", {"name": "World"})
+print(result)  # -> "Hello World!"
+```
+
 ## 🔧 Configuration
 
 ```python
