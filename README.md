@@ -359,6 +359,11 @@ config.add_agent_config("openai", AgentConfig(
 ## 🧪 Testing
 
 ### Tests Unitarios
+Antes de ejecutar los tests, instala las dependencias de desarrollo:
+```bash
+pip install -e .[dev]
+```
+Estas extras incluyen librerías como `aiohttp` utilizadas en las pruebas.
 ```bash
 # Ejecutar todos los tests
 pytest packages/*/tests/
