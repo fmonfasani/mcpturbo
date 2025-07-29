@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcpturbo-orchestrator"
-version = "1.0.0"
+version = "1.0.2"
 description = "MCPTurbo - Intelligent Agent Orchestration & Coordination"
 readme = "README.md"
 license = {text = "MIT"}
