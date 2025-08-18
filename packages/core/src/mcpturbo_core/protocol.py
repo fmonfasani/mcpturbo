@@ -26,7 +26,7 @@ class CircuitBreaker:
             return True
         elif self.state == CircuitState.OPEN:
             if self.last_failure_time and \
-               (datetime.utcnow() - self.last_failure_time).seconds >= self.recovery_timeout:
+               (datetime.utcnow() - self.last_failure_time).total_seconds() >= self.recovery_timeout:
                 self.state = CircuitState.HALF_OPEN
                 return True
             return False
