@@ -26,9 +26,8 @@ async def test_workflow_success_path():
         Task(id="t2", agent_id=agent.config.agent_id, action="echo", data={}, dependencies=["t1"]),
     ]
     wf = Workflow(id="wf_success", name="Success", tasks=tasks)
-    orch.workflows[wf.id] = wf
 
-    result = await orch.execute_workflow(wf.id)
+    result = await orch.execute_workflow(wf)
     assert result["status"] == WorkflowStatus.COMPLETED.value
     results = {t["id"]: t["result"] for t in result["tasks"]}
     assert results["t1"] == {"a": 1}
@@ -44,9 +43,8 @@ async def test_workflow_failure_path():
         Task(id="t2", agent_id=agent.config.agent_id, action="fail", data={}, dependencies=["t1"]),
     ]
     wf = Workflow(id="wf_fail", name="Fail", tasks=tasks)
-    orch.workflows[wf.id] = wf
 
-    result = await orch.execute_workflow(wf.id)
+    result = await orch.execute_workflow(wf)
     assert result["status"] == WorkflowStatus.FAILED.value
     statuses = {t["id"]: t["status"] for t in result["tasks"]}
     assert statuses["t1"] == WorkflowStatus.FAILED.value

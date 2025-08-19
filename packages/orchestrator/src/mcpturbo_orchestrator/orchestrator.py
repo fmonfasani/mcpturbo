@@ -3,7 +3,7 @@ from typing import Dict, List, Any, Callable, Optional
 from datetime import datetime
 from .workflow_model import Workflow
 from .task_model import Task
-from .workflow_state import WorkflowStatus
+from .workflow_state import WorkflowStatus, TaskPriority
 from mcpturbo_core.protocol import protocol
 from mcpturbo_core.exceptions import MCPError
 from mcpturbo_agents import BaseAgent

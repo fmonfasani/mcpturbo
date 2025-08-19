@@ -26,9 +26,8 @@ async def test_simple_workflow_execution():
         Task(id="t2", agent_id="echo", action="echo", data={}, dependencies=["t1"]),
     ]
     wf = Workflow(id="wf1", name="Echo", tasks=tasks)
-    orchestrator.workflows[wf.id] = wf
 
-    result = await orchestrator.execute_workflow(wf.id)
+    result = await orchestrator.execute_workflow(wf)
     assert result["status"] == WorkflowStatus.COMPLETED.value
     task_results = {t["id"]: t["result"] for t in result["tasks"]}
     assert task_results["t1"] == {"msg": "hi"}

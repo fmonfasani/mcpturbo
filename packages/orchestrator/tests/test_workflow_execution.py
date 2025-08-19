@@ -1,14 +1,5 @@
 import os
-from pathlib import Path
-import sys
 import pytest
-
-ROOT = Path(__file__).resolve().parents[3]
-sys.path.extend([
-    str(ROOT / "packages" / "agents"),
-    str(ROOT / "packages" / "core"),
-    str(ROOT),
-])
 
 from mcpturbo_orchestrator import ProjectOrchestrator, Workflow, Task, WorkflowStatus
 from mcpturbo_agents import GenesisAgent, AgentConfig, AgentType
@@ -25,7 +16,5 @@ async def test_simple_workflow_execution():
         name="Test Workflow",
         tasks=[Task(id="t1", agent_id="gen-wf", action="echo", data={"msg": "hi"})],
     )
-    orch.workflows["wf1"] = workflow
-
-    result = await orch.execute_workflow("wf1")
+    result = await orch.execute_workflow(workflow)
     assert result["status"] == WorkflowStatus.COMPLETED.value
