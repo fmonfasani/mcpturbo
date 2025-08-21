@@ -9,9 +9,10 @@ __author__ = "Federico Monfasani"
 
 # Core orchestration classes
 from .orchestrator import (
-    ProjectOrchestrator, Workflow, Task, 
+    ProjectOrchestrator, Workflow, Task,
     WorkflowStatus, TaskPriority, orchestrator
 )
+from .workflow_templates import TEMPLATE_BUILDERS
 
 # Main exports
 __all__ = [
@@ -33,10 +34,10 @@ __all__ = [
 ]
 
 # Convenience functions
-async def quick_workflow(template_name: str, **kwargs) -> str:
+async def quick_workflow(template_name: str, **kwargs) -> dict:
     """Create and execute workflow from template"""
-    workflow_id = await orchestrator.create_workflow_from_template(template_name, **kwargs)
-    result = await orchestrator.execute_workflow(workflow_id)
+    workflow = orchestrator.create_workflow_from_template(template_name, **kwargs)
+    result = await orchestrator.execute_workflow(workflow)
     return result
 
 async def generate_app(app_name: str, app_type: str = "web", **kwargs) -> dict:
@@ -52,16 +53,12 @@ async def design_architecture(requirements: str, **kwargs) -> dict:
     return await quick_workflow("architecture_design", requirements=requirements, **kwargs)
 
 # Workflow templates available
-AVAILABLE_TEMPLATES = [
-    "app_generation",
-    "code_review", 
-    "architecture_design"
-]
+AVAILABLE_TEMPLATES = list(TEMPLATE_BUILDERS.keys())
 
 # Setup function for orchestrator
 async def setup_orchestrator(*agents, **config):
     """Setup orchestrator with agents"""
     for agent in agents:
         orchestrator.register_agent(agent, **config)
-    
+
     return orchestrator
