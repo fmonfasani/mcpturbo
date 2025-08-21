@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcpturbo-shared-types"
+version = "1.0.0"
+description = "Shared Pydantic models and TypeScript types for MCPturbo"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Federico Monfasani", email = "fmonfasani@gmail.com"}
+]
+keywords = ["mcpturbo", "types", "pydantic", "typescript"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["datamodel-code-generator>=0.25.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["mcpturbo_shared_types*"]

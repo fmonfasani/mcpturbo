@@ -109,6 +109,28 @@ async def main():
 asyncio.run(main())
 ```
 
+## 📘 Tipos Compartidos y Clientes TypeScript
+
+El paquete `mcpturbo-shared-types` expone modelos Pydantic y archivos `.d.ts`
+equivalentes para que los clientes escritos en TypeScript puedan reutilizar los
+mismos tipos.
+
+```bash
+pip install mcpturbo-shared-types
+```
+
+Luego, desde un proyecto TypeScript, importa las interfaces:
+
+```ts
+import type { Message, Workflow } from "mcpturbo-shared-types/types";
+
+const message: Message = {
+  id: "1",
+  role: "user",
+  content: "hola",
+};
+```
+
 ## 🛠️ Uso como librería
 
 El protocolo y el orquestador se exponen también como clases para que puedas
