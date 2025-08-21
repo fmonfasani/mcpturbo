@@ -5,9 +5,18 @@ from typing import Dict, List, Optional, Any, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+
+from opentelemetry import metrics, trace
+
 from .messages import Request, Response, Event
 from .exceptions import MCPError, TimeoutError, RateLimitError, CircuitBreakerError
 from .config import get_config
+
+
+tracer = trace.get_tracer(__name__)
+meter = metrics.get_meter(__name__)
+_ext_req_counter = meter.create_counter("external_requests_total")
+_ext_req_duration = meter.create_histogram("external_request_duration")
 
 class CircuitState(Enum):
     CLOSED = "closed"
@@ -232,32 +241,41 @@ class MCPProtocol:
     async def _send_external_request(self, agent: Any, request: Request) -> Any:
         if not self.session:
             await self.start()
-        
-        # Construir payload según el tipo de agente
-        if hasattr(agent, 'build_payload'):
-            payload = agent.build_payload(request)
-        else:
-            payload = {
-                "action": request.action,
-                "data": request.data
-            }
-        
-        headers = {}
-        if hasattr(agent, 'api_key'):
-            headers['Authorization'] = f"Bearer {agent.api_key}"
-        if hasattr(agent, 'headers'):
-            headers.update(agent.headers)
-        
-        async with self.session.post(
-            agent.api_url,
-            json=payload,
-            headers=headers,
-            timeout=request.timeout
-        ) as response:
-            if response.status >= 400:
-                raise MCPError(f"API error {response.status}: {await response.text()}")
-            
-            return await response.json()
+
+        start = time.perf_counter()
+        with tracer.start_as_current_span("protocol.send_external_request") as span:
+            span.set_attribute("agent", request.target)
+
+            # Construir payload según el tipo de agente
+            if hasattr(agent, 'build_payload'):
+                payload = agent.build_payload(request)
+            else:
+                payload = {
+                    "action": request.action,
+                    "data": request.data
+                }
+
+            headers = {}
+            if hasattr(agent, 'api_key'):
+                headers['Authorization'] = f"Bearer {agent.api_key}"
+            if hasattr(agent, 'headers'):
+                headers.update(agent.headers)
+
+            async with self.session.post(
+                agent.api_url,
+                json=payload,
+                headers=headers,
+                timeout=request.timeout
+            ) as response:
+                if response.status >= 400:
+                    raise MCPError(f"API error {response.status}: {await response.text()}")
+
+                result = await response.json()
+
+        duration = time.perf_counter() - start
+        _ext_req_counter.add(1, {"agent": request.target})
+        _ext_req_duration.record(duration, {"agent": request.target})
+        return result
     
     async def broadcast_event(self, sender_id: str, event: str, data: Dict[str, Any] = None):
         event_msg = Event(
