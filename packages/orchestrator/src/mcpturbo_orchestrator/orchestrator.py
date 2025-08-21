@@ -5,6 +5,7 @@ from datetime import datetime
 from .workflow_model import Workflow
 from .task_model import Task
 from .workflow_state import WorkflowStatus, TaskPriority
+from .workflow_templates import TEMPLATE_BUILDERS
 from mcpturbo_core.protocol import protocol
 from mcpturbo_core.exceptions import MCPError
 from mcpturbo_agents import BaseAgent
@@ -30,6 +31,30 @@ class ProjectOrchestrator:
 
     def subscribe_to_events(self, event: str, handler: Callable):
         self.event_handlers.setdefault(event, []).append(handler)
+
+    def create_workflow_from_template(self, name: str, **kwargs) -> Workflow:
+        """Instantiate a workflow from a named template.
+
+        Parameters
+        ----------
+        name:
+            Template identifier present in :data:`TEMPLATE_BUILDERS`.
+        **kwargs:
+            Parameters forwarded to the template builder.
+
+        Returns
+        -------
+        Workflow
+            The newly created workflow, also registered in ``self.workflows``.
+        """
+
+        builder = TEMPLATE_BUILDERS.get(name)
+        if builder is None:
+            raise ValueError(f"Unknown workflow template: {name}")
+
+        workflow = builder(**kwargs)
+        self.workflows[workflow.id] = workflow
+        return workflow
 
     async def execute_workflow(self, workflow: Workflow) -> Dict[str, Any]:
         self.workflows[workflow.id] = workflow
