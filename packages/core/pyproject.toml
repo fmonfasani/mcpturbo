@@ -38,6 +38,7 @@ dependencies = [
     
     # Configuration and serialization
     "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
     
     # Enhanced error handling and retry logic
     "tenacity>=8.0.0",

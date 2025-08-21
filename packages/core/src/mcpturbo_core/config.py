@@ -3,6 +3,19 @@ from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from pathlib import Path
 import json
+import warnings
+
+try:
+    from dotenv import load_dotenv
+except Exception:  # pragma: no cover - dotenv optional
+    load_dotenv = None
+
+if load_dotenv and load_dotenv():
+    warnings.warn(
+        "Loaded environment variables from .env file. "
+        "For production use a secure secrets vault.",
+        RuntimeWarning,
+    )
 
 @dataclass
 class AgentConfig:
@@ -19,9 +32,10 @@ class AgentConfig:
 class MCPConfig:
     # Protocol settings
     max_concurrent_requests: int = 10
-    default_timeout: int = 30
-    default_retry_attempts: int = 3
+    timeout: int = 30
+    retry_attempts: int = 3
     queue_size: int = 1000
+    max_tokens: int = 2000
     
     # Agent configurations
     agents: Dict[str, AgentConfig] = field(default_factory=dict)
@@ -38,6 +52,12 @@ class MCPConfig:
     # Storage
     cache_dir: str = field(default_factory=lambda: os.getenv("MCP_CACHE_DIR", "~/.mcpturbo/cache"))
     config_dir: str = field(default_factory=lambda: os.getenv("MCP_CONFIG_DIR", "~/.mcpturbo"))
+
+    # Tool permissions
+    tool_permissions: Dict[str, bool] = field(default_factory=dict)
+    sensitive_actions: List[str] = field(
+        default_factory=lambda: ["write_file", "delete_file", "execute_command"]
+    )
     
     def __post_init__(self):
         # Expand user paths
@@ -103,13 +123,16 @@ class MCPConfig:
         # Convert to serializable format
         config_dict = {
             "max_concurrent_requests": self.max_concurrent_requests,
-            "default_timeout": self.default_timeout,
-            "default_retry_attempts": self.default_retry_attempts,
+            "timeout": self.timeout,
+            "retry_attempts": self.retry_attempts,
             "queue_size": self.queue_size,
+            "max_tokens": self.max_tokens,
             "debug": self.debug,
             "log_level": self.log_level,
             "cache_dir": self.cache_dir,
             "config_dir": self.config_dir,
+            "tool_permissions": self.tool_permissions,
+            "sensitive_actions": self.sensitive_actions,
             "agents": {
                 agent_id: {
                     "api_key": "***" if config.api_key else "",  # Don't save actual keys
@@ -157,14 +180,19 @@ class MCPConfig:
         
         return cls(
             max_concurrent_requests=config_dict.get("max_concurrent_requests", 10),
-            default_timeout=config_dict.get("default_timeout", 30),
-            default_retry_attempts=config_dict.get("default_retry_attempts", 3),
+            timeout=config_dict.get("timeout", 30),
+            retry_attempts=config_dict.get("retry_attempts", 3),
             queue_size=config_dict.get("queue_size", 1000),
+            max_tokens=config_dict.get("max_tokens", 2000),
             debug=config_dict.get("debug", False),
             log_level=config_dict.get("log_level", "INFO"),
             cache_dir=config_dict.get("cache_dir", "~/.mcpturbo/cache"),
             config_dir=config_dict.get("config_dir", "~/.mcpturbo"),
-            agents=agents
+            tool_permissions=config_dict.get("tool_permissions", {}),
+            sensitive_actions=config_dict.get(
+                "sensitive_actions", ["write_file", "delete_file", "execute_command"]
+            ),
+            agents=agents,
         )
     
     def validate(self) -> List[str]:
@@ -175,10 +203,13 @@ class MCPConfig:
         if not any([self.openai_api_key, self.claude_api_key, self.deepseek_api_key]):
             issues.append("No API keys configured. Set OPENAI_API_KEY, CLAUDE_API_KEY, or DEEPSEEK_API_KEY environment variables.")
         
-        # Validate timeouts
-        if self.default_timeout <= 0:
-            issues.append("default_timeout must be positive")
-        
+        # Validate limits
+        if self.timeout <= 0:
+            issues.append("timeout must be positive")
+
+        if self.max_tokens <= 0:
+            issues.append("max_tokens must be positive")
+
         if self.max_concurrent_requests <= 0:
             issues.append("max_concurrent_requests must be positive")
         

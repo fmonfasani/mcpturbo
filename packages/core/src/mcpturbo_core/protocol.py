@@ -7,6 +7,7 @@ from datetime import datetime
 from enum import Enum
 from .messages import Request, Response, Event
 from .exceptions import MCPError, TimeoutError, RateLimitError, CircuitBreakerError
+from .config import get_config
 
 class CircuitState(Enum):
     CLOSED = "closed"
@@ -112,13 +113,34 @@ class MCPProtocol:
             self.event_handlers[event] = []
         self.event_handlers[event].append(handler)
     
-    async def send_request(self, sender_id: str, target_id: str, action: str, 
+    async def send_request(self, sender_id: str, target_id: str, action: str,
                           data: Dict[str, Any] = None, timeout: int = 30,
                           retry_config: Optional[RetryConfig] = None) -> Response:
-        
+
         if not self.running:
             await self.start()
-        
+
+        config = get_config()
+        if action in config.tool_permissions and not config.tool_permissions[action]:
+            raise MCPError(f"Action '{action}' is not permitted by configuration.")
+
+        if action in config.sensitive_actions:
+            confirm = input(
+                f"Action '{action}' requires confirmation. Proceed? (y/N): "
+            ).strip().lower()
+            if confirm not in {"y", "yes"}:
+                raise MCPError(f"Action '{action}' cancelled by user.")
+
+        if timeout > config.timeout:
+            raise MCPError(
+                f"Request timeout {timeout} exceeds configured maximum {config.timeout}"
+            )
+        max_tokens = (data or {}).get("max_tokens")
+        if max_tokens and max_tokens > config.max_tokens:
+            raise MCPError(
+                f"Request max_tokens {max_tokens} exceeds configured maximum {config.max_tokens}"
+            )
+
         # Verificar circuit breaker
         circuit_breaker = self.circuit_breakers.get(target_id)
         if circuit_breaker and not circuit_breaker.should_allow_request():

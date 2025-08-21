@@ -3,6 +3,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 from enum import Enum
 import uuid
+from .config import get_config
 
 class MessageType(str, Enum):
     REQUEST = "request"
@@ -41,6 +42,13 @@ class Request(Message):
     action: str = ""
     timeout: int = 30
     correlation_id: Optional[str] = None
+
+    def __post_init__(self):
+        config = get_config()
+        if self.timeout > config.timeout:
+            raise ValueError(
+                f"Request timeout {self.timeout} exceeds allowed maximum {config.timeout}"
+            )
     
     def to_dict(self) -> Dict[str, Any]:
         base = super().to_dict()
@@ -98,6 +106,14 @@ class AIRequest(Request):
     temperature: float = 0.7
     max_tokens: Optional[int] = None
     system_prompt: Optional[str] = None
+
+    def __post_init__(self):
+        super().__post_init__()
+        config = get_config()
+        if self.max_tokens and self.max_tokens > config.max_tokens:
+            raise ValueError(
+                f"Request max_tokens {self.max_tokens} exceeds allowed maximum {config.max_tokens}"
+            )
     
     def to_dict(self) -> Dict[str, Any]:
         base = super().to_dict()
