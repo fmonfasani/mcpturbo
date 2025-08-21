@@ -18,6 +18,12 @@ meter = metrics.get_meter(__name__)
 _ext_req_counter = meter.create_counter("external_requests_total")
 _ext_req_duration = meter.create_histogram("external_request_duration")
 
+
+tracer = trace.get_tracer(__name__)
+meter = metrics.get_meter(__name__)
+_ext_req_counter = meter.create_counter("external_requests_total")
+_ext_req_duration = meter.create_histogram("external_request_duration")
+
 class CircuitState(Enum):
     CLOSED = "closed"
     OPEN = "open" 
