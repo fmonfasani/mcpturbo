@@ -596,15 +596,20 @@ for agent_id in ["openai", "claude", "deepseek"]:
 git clone https://github.com/fmonfasani/mcpturbo.git
 cd mcpturbo
 
-# Instalar en modo desarrollo
-pip install -e ".[dev]"
+# Instalar dependencias y hooks
+make setup
 
-# Pre-commit hooks
-pre-commit install
+# Lint de todo el código
+make lint
 
 # Ejecutar tests
-pytest
+make test
+
+# Benchmarks opcionales
+make bench
 ```
+
+Si usas VSCode, este repositorio incluye configuración de [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) en `.devcontainer/devcontainer.json` para proporcionar un entorno con Python 3.11 y las dependencias de desarrollo preinstaladas.
 
 ### Guidelines
 1. **Código**: Seguir PEP 8, usar Black y isort
