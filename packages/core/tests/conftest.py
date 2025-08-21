@@ -3,14 +3,19 @@
 import pytest
 import sys
 from pathlib import Path
+import structlog
 
 # Add package to Python path
 package_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(package_dir))
+sys.path.insert(0, str(package_dir / "src"))
 # Ensure other packages in repository are importable
 repo_root = package_dir.parent.parent
 sys.path.insert(0, str(repo_root))
-sys.path.insert(0, str(repo_root / "packages" / "agents"))
+sys.path.insert(0, str(repo_root / "packages" / "agents" / "src"))
+
+from mcpturbo_core.logger import configure_logging
+
+configure_logging()
 
 
 @pytest.fixture
@@ -26,3 +31,10 @@ def sample_data():
         "test_mode": True,
         "environment": "test"
     }
+
+
+@pytest.fixture
+def log_capture():
+    """Capture structlog logs for assertions."""
+    with structlog.testing.capture_logs() as captured:
+        yield captured

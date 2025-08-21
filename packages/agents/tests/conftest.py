@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Add package to Python path
 package_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(package_dir))
+sys.path.insert(0, str(package_dir / "src"))
 
 
 @pytest.fixture
