@@ -4,11 +4,12 @@ Tests for MCPturbo v2 Protocol
 
 import pytest
 import asyncio
+import socket
 from unittest.mock import Mock, AsyncMock, patch
 import aiohttp
 from aiohttp import web
 
-from mcpturbo_core.protocol import MCPProtocol, CircuitBreaker, RateLimiter
+from mcpturbo_core.protocol import MCPProtocol, CircuitBreaker, RateLimiter, RetryConfig
 from mcpturbo_core.messages import Request, Response, create_request
 from mcpturbo_core.exceptions import MCPError, TimeoutError, CircuitBreakerError, RateLimitError
 from mcpturbo_agents.base_agent import LocalAgent, ExternalAgent, AgentConfig, AgentType
@@ -241,7 +242,7 @@ class TestMCPProtocol:
     async def test_protocol_stats(self, protocol, mock_agent):
         """Test protocol statistics"""
         protocol.register_agent(mock_agent.config.agent_id, mock_agent)
-        
+
         stats = protocol.get_stats()
         
         assert "agents" in stats
@@ -250,6 +251,90 @@ class TestMCPProtocol:
         assert "rate_limits" in stats
         assert stats["agents"] == 1
         assert stats["running"] is True
+
+    async def test_send_request_retries(self, protocol, mock_agent):
+        """Ensure send_request retries on failure"""
+        protocol.register_agent(mock_agent.config.agent_id, mock_agent)
+
+        attempts = {"count": 0}
+
+        async def fail_then_succeed(request):
+            attempts["count"] += 1
+            if attempts["count"] < 3:
+                raise MCPError("boom")
+            return Response(
+                sender=request.target,
+                target=request.sender,
+                request_id=request.id,
+                success=True,
+                result={"ok": True},
+            )
+
+        # Patch internal method to simulate failures
+        protocol._send_request_attempt = AsyncMock(side_effect=fail_then_succeed)
+
+        resp = await protocol.send_request(
+            sender_id="s",
+            target_id="test_agent",
+            action="a",
+            retry_config=RetryConfig(max_attempts=3, initial_delay=0),
+        )
+
+        assert resp.success and attempts["count"] == 3
+
+    async def test_circuit_breaker_trips_on_failures(self, protocol, mock_agent):
+        """Circuit breaker opens after repeated failures"""
+        protocol.register_agent(mock_agent.config.agent_id, mock_agent, failure_threshold=1)
+
+        async def always_fail(request):
+            raise MCPError("failure")
+
+        protocol._send_request_attempt = AsyncMock(side_effect=always_fail)
+
+        with pytest.raises(MCPError):
+            await protocol.send_request(
+                "s", "test_agent", "a", retry_config=RetryConfig(max_attempts=1)
+            )
+
+        with pytest.raises(CircuitBreakerError):
+            await protocol.send_request(
+                "s", "test_agent", "a", retry_config=RetryConfig(max_attempts=1)
+            )
+
+    async def test_send_external_request(self, protocol):
+        """Validate _send_external_request with a real HTTP server"""
+
+        async def run_server(handler):
+            app = web.Application()
+            app.router.add_post("/", handler)
+            runner = web.AppRunner(app)
+            await runner.setup()
+            sock = socket.socket()
+            sock.bind(("127.0.0.1", 0))
+            port = sock.getsockname()[1]
+            sock.close()
+            site = web.TCPSite(runner, "127.0.0.1", port)
+            await site.start()
+            return runner, f"http://127.0.0.1:{port}/"
+
+        async def ok_handler(request):
+            return web.json_response({"msg": "ok"})
+
+        runner, url = await run_server(ok_handler)
+        agent = ExternalAgent("srv", "Srv", api_url=url, api_key="")
+        req = create_request(sender="u", target="srv", action="a")
+        data = await protocol._send_external_request(agent, req)
+        assert data["msg"] == "ok"
+        await runner.cleanup()
+
+        async def err_handler(request):
+            return web.Response(status=500, text="err")
+
+        runner, url = await run_server(err_handler)
+        agent.api_url = url
+        with pytest.raises(MCPError):
+            await protocol._send_external_request(agent, req)
+        await runner.cleanup()
 
 
 class TestCircuitBreaker:
