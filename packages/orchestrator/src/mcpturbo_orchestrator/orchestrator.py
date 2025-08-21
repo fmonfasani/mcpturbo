@@ -1,4 +1,5 @@
 import asyncio
+import time
 from typing import Dict, List, Any, Callable, Optional
 from datetime import datetime
 from .workflow_model import Workflow
@@ -7,6 +8,13 @@ from .workflow_state import WorkflowStatus, TaskPriority
 from mcpturbo_core.protocol import protocol
 from mcpturbo_core.exceptions import MCPError
 from mcpturbo_agents import BaseAgent
+from opentelemetry import metrics, trace
+
+
+tracer = trace.get_tracer(__name__)
+meter = metrics.get_meter(__name__)
+_workflow_counter = meter.create_counter("workflow_executions_total")
+_workflow_duration = meter.create_histogram("workflow_execution_duration")
 
 class ProjectOrchestrator:
     def __init__(self):
@@ -25,12 +33,20 @@ class ProjectOrchestrator:
 
     async def execute_workflow(self, workflow: Workflow) -> Dict[str, Any]:
         self.workflows[workflow.id] = workflow
-        task = asyncio.create_task(self._execute_workflow_internal(workflow))
-        self.running_workflows[workflow.id] = task
-        try:
-            return await task
-        finally:
-            self.running_workflows.pop(workflow.id, None)
+        start = time.perf_counter()
+        with tracer.start_as_current_span("orchestrator.execute_workflow") as span:
+            span.set_attribute("workflow.id", workflow.id)
+            task = asyncio.create_task(self._execute_workflow_internal(workflow))
+            self.running_workflows[workflow.id] = task
+            try:
+                result = await task
+            finally:
+                self.running_workflows.pop(workflow.id, None)
+
+        duration = time.perf_counter() - start
+        _workflow_counter.add(1, {"workflow": workflow.id})
+        _workflow_duration.record(duration, {"workflow": workflow.id})
+        return result
 
     async def _execute_workflow_internal(self, workflow: Workflow) -> Dict[str, Any]:
         workflow.status = WorkflowStatus.RUNNING
