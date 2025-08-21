@@ -8,58 +8,76 @@ __version__ = "2.0.0"
 __author__ = "Federico Monfasani"
 
 # Core protocol and configuration
-from .protocol import MCPProtocol, protocol
-from .config import MCPConfig, get_config, load_config, save_config, validate_environment
+from .protocol import MCPProtocol, protocol, send_external_request
+from .config import (
+    MCPConfig,
+    get_config,
+    load_config,
+    save_config,
+    validate_environment,
+)
 from .exceptions import (
-    MCPError, TimeoutError, RateLimitError, CircuitBreakerError,
-    AgentNotFoundError, AuthenticationError, ValidationError, APIError,
-    ConfigurationError, SerializationError
+    MCPError,
+    TimeoutError,
+    RateLimitError,
+    CircuitBreakerError,
+    AgentNotFoundError,
+    AuthenticationError,
+    ValidationError,
+    APIError,
+    ConfigurationError,
+    SerializationError,
 )
 from .logger import configure_logging
 
 # Message types
 from .messages import (
-    Message, Request, Response, Event, AIRequest, AIResponse,
-    MessageType, Priority,
-    create_request, create_ai_request, create_response, create_event
+    Message,
+    Request,
+    Response,
+    Event,
+    AIRequest,
+    AIResponse,
+    MessageType,
+    Priority,
+    create_request,
+    create_ai_request,
+    create_response,
+    create_event,
 )
 
 # Main exports
 __all__ = [
     # Core classes
     "MCPProtocol",
-    "MCPConfig", 
-    
+    "MCPConfig",
     # Global instances
     "protocol",
-    
+    "send_external_request",
     # Configuration functions
     "get_config",
-    "load_config", 
+    "load_config",
     "save_config",
     "validate_environment",
     "configure_logging",
-    
     # Message types
     "Message",
     "Request",
-    "Response", 
+    "Response",
     "Event",
     "AIRequest",
     "AIResponse",
     "MessageType",
     "Priority",
-    
     # Message factories
     "create_request",
     "create_ai_request",
     "create_response",
     "create_event",
-    
     # Exceptions
     "MCPError",
     "TimeoutError",
-    "RateLimitError", 
+    "RateLimitError",
     "CircuitBreakerError",
     "AgentNotFoundError",
     "AuthenticationError",
@@ -67,36 +85,40 @@ __all__ = [
     "APIError",
     "ConfigurationError",
     "SerializationError",
-    
     # Metadata
     "__version__",
-    "__author__"
+    "__author__",
 ]
+
 
 # Initialize global protocol
 async def initialize():
     """Initialize MCPturbo core components"""
     await protocol.start()
 
+
 async def cleanup():
     """Cleanup MCPturbo core components"""
     await protocol.stop()
 
+
 # Quick setup function
-def quick_setup(openai_key: str = None, claude_key: str = None, deepseek_key: str = None) -> MCPConfig:
+def quick_setup(
+    openai_key: str = None, claude_key: str = None, deepseek_key: str = None
+) -> MCPConfig:
     """
     Quick setup for MCPturbo with API keys
-    
+
     Args:
         openai_key: OpenAI API key
-        claude_key: Claude API key  
+        claude_key: Claude API key
         deepseek_key: DeepSeek API key
-        
+
     Returns:
         Configured MCPConfig instance
     """
     import os
-    
+
     # Set environment variables if provided
     if openai_key:
         os.environ["OPENAI_API_KEY"] = openai_key
@@ -104,13 +126,13 @@ def quick_setup(openai_key: str = None, claude_key: str = None, deepseek_key: st
         os.environ["CLAUDE_API_KEY"] = claude_key
     if deepseek_key:
         os.environ["DEEPSEEK_API_KEY"] = deepseek_key
-    
+
     # Load configuration
     config = load_config()
-    
+
     # Validate setup
     validation = validate_environment()
     if not validation["valid"]:
         raise MCPError(f"Setup validation failed: {validation['issues']}")
-    
+
     return config
